@@ -20,6 +20,8 @@ def get_editor():
 def load_from_s3(bucket, key):
     try:
         obj = client.get_object(Bucket=bucket, Key=key)
+        acl = client.get_object_acl(Bucket=bucket, Key=key)
+        acl.pop('ResponseMetadata')
     except client.exceptions.NoSuchKey as e:
         msg = f'In bucket {bucket}, the key {key} doesn\'t exist.'
         raise S3editError(msg)
@@ -27,12 +29,13 @@ def load_from_s3(bucket, key):
         msg = f'The bucket {bucket} doesn\'t exist.'
         raise S3editError(msg)
     content = obj['Body'].read().decode('utf8')
-    return content
+    return content, acl
 
 
-def save_to_s3(bucket, key, content):
+def save_to_s3(bucket, key, content, acl):
     obj = content.encode('utf-8')
     client.put_object(Body=obj, Bucket=bucket, Key=key)
+    client.put_object_acl(Bucket=bucket, Key=key, AccessControlPolicy=acl)
 
 
 def bucket_key_from_path(path):
@@ -44,10 +47,10 @@ def bucket_key_from_path(path):
 
 def edit_from_s3(path):
     bucket, key = bucket_key_from_path(path)
-    content = load_from_s3(bucket, key)
+    content, acl = load_from_s3(bucket, key)
     prefix, suffix = os.path.splitext(key)
     content = edit_content(content, suffix)
-    save_to_s3(bucket, key, content)
+    save_to_s3(bucket, key, content, acl)
 
 
 def edit_content(content, suffix):
