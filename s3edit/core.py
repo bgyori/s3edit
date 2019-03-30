@@ -37,14 +37,16 @@ def bucket_key_from_path(path):
 def edit_from_s3(path):
     bucket, key = bucket_key_from_path(path)
     content = load_from_s3(bucket, key)
-    content = edit_content(content)
+    prefix, suffix = os.path.splitext(key)
+    content = edit_content(content, suffix)
     save_to_s3(bucket, key, content)
 
 
-def edit_content(content):
+def edit_content(content, suffix):
+    suffix = suffix if suffix else '.tmp'
     editor = get_editor()
     name = None
-    with tempfile.NamedTemporaryFile(suffix='.tmp', mode='w',
+    with tempfile.NamedTemporaryFile(suffix=suffix, mode='w',
                                      delete=False) as tf:
         name = tf.name
         tf.write(content)
