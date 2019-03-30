@@ -1,6 +1,7 @@
 import os
 import boto3
 import logging
+import botocore
 import tempfile
 import subprocess
 
@@ -17,7 +18,14 @@ def get_editor():
 
 
 def load_from_s3(bucket, key):
-    obj = client.get_object(Bucket=bucket, Key=key)
+    try:
+        obj = client.get_object(Bucket=bucket, Key=key)
+    except client.exceptions.NoSuchKey as e:
+        msg = f'In bucket {bucket}, the key {key} doesn\'t exist.'
+        raise S3editError(msg)
+    except client.exceptions.NoSuchBucket as e:
+        msg = f'The bucket {bucket} doesn\'t exist.'
+        raise S3editError(msg)
     content = obj['Body'].read().decode('utf8')
     return content
 
@@ -56,3 +64,7 @@ def edit_content(content, suffix):
     with open(name, 'r') as fh:
         content = fh.read()
     return content
+
+
+class S3editError(Exception):
+    pass
