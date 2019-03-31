@@ -23,10 +23,10 @@ def load_from_s3(bucket, key):
         acl = client.get_object_acl(Bucket=bucket, Key=key)
         acl.pop('ResponseMetadata')
     except client.exceptions.NoSuchKey as e:
-        msg = f'In bucket {bucket}, the key {key} doesn\'t exist.'
+        msg = 'In bucket %s, the key %s doesn\'t exist.' % (bucket, key)
         raise S3editError(msg)
     except client.exceptions.NoSuchBucket as e:
-        msg = f'The bucket {bucket} doesn\'t exist.'
+        msg = 'The bucket %s doesn\'t exist.' % bucket
         raise S3editError(msg)
     content = obj['Body'].read().decode('utf8')
     return content, acl
