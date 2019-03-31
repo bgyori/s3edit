@@ -1,10 +1,15 @@
 from setuptools import setup
 
 
+with open('README.md', 'r') as fh:
+    long_description = fh.read()
+
+
 def main():
     setup(name='s3edit',
           version='0.0.1',
           description='Edit files from S3 directly with your default editor.',
+          long_description=long_description,
           author='Benjamin M. Gyori',
           author_email='ben.gyori@gmail.com',
           url='https://github.com/bgyori/s3edit',
