@@ -9,6 +9,14 @@ def main():
           author_email='ben.gyori@gmail.com',
           url='https://github.com/bgyori/s3edit',
           packages=['s3edit'],
+          classifiers=[
+            'Development Status :: 4 - Beta',
+            'Environment :: Console',
+            'Intended Audience :: Developers',
+            'License :: OSI Approved :: BSD License',
+            'Operating System :: OS Independent',
+            'Programming Language :: Python :: 3 :: Only',
+            ],
           install_requires=['boto3', 'click'],
           entry_points={'console_scripts': ['s3edit = s3edit.cli:main']}
           )
